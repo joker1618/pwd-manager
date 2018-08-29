@@ -33,9 +33,9 @@
         </dependency>
         <!-- ScenicView -->
         <dependency>
-            <groupId>org</groupId>
+            <groupId>3rdParty.org</groupId>
             <artifactId>scenicview</artifactId>
-            <version>1.0</version>
+            <version>8.7.0</version>
         </dependency>
         <!-- TEST -->
         <dependency>
@@ -94,7 +94,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>C:/Users/f.barbano/JokerApps/pwd-manager</outputDirectory>
+                            <outputDirectory>${user.home}/JokerApps/pwd-manager</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${project.build.directory}</directory>
