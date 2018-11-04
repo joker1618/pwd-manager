@@ -1,6 +1,6 @@
 package xxx.joker.apps.pwdmanager.common;
 
-import xxx.joker.apps.pwdmanager.main.PwdGUINew;
+import xxx.joker.apps.pwdmanager.main.PwdGUI;
 import xxx.joker.libs.core.utils.JkFiles;
 
 import java.nio.file.Files;
@@ -15,7 +15,7 @@ public class Configs {
 	public static final Path ROOT_FOLDER;
 	public static final boolean RUN_ON_IDE;
 	static {
-		Path launcherPath = JkFiles.getLauncherPath(PwdGUINew.class);
+		Path launcherPath = JkFiles.getLauncherPath(PwdGUI.class);
         RUN_ON_IDE = !Files.isRegularFile(launcherPath) || !launcherPath.getFileName().toString().endsWith(".jar");
         ROOT_FOLDER = RUN_ON_IDE ? Paths.get("") : JkFiles.getParent(launcherPath);
 	}

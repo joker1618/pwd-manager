@@ -5,20 +5,18 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import org.scenicview.ScenicView;
 import xxx.joker.apps.pwdmanager.common.Configs;
-import xxx.joker.apps.pwdmanager.controller.PwdControllerNEW;
+import xxx.joker.apps.pwdmanager.controller.PwdController;
 import xxx.joker.libs.core.utils.JkEncryption;
 import xxx.joker.libs.core.utils.JkFiles;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * Created by f.barbano on 19/11/2017.
  */
-public class PwdGUINew extends Application {
+public class PwdGUI extends Application {
 
 
 	public static void main(String[] args) throws IOException {
@@ -30,7 +28,7 @@ public class PwdGUINew extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/pwdViewNEW.fxml"));
-		PwdControllerNEW pwdController = new PwdControllerNEW(primaryStage);
+		PwdController pwdController = new PwdController(primaryStage);
 		fxmlLoader.setController(pwdController);
 		BorderPane pwdPane = fxmlLoader.load();
 
@@ -51,7 +49,7 @@ public class PwdGUINew extends Application {
 
 	private static void manageAppData() throws IOException {
 		if(!Configs.RUN_ON_IDE) {
-			String actualHash = JkEncryption.getMD5(JkFiles.getLauncherPath(PwdGUINew.class));
+			String actualHash = JkEncryption.getMD5(JkFiles.getLauncherPath(PwdGUI.class));
 			// Check if running app is new or not
 			boolean newVersion = true;
 			if (Files.exists(Configs.MD5SUM_JAR_FILE)) {

@@ -40,9 +40,9 @@ import java.util.ResourceBundle;
 /**
  * Created by f.barbano on 19/11/2017.
  */
-public class PwdControllerNEW extends AbstractController implements Initializable {
+public class PwdController extends AbstractController implements Initializable {
 
-	private static final Logger logger = LoggerFactory.getLogger(PwdControllerNEW.class);
+	private static final Logger logger = LoggerFactory.getLogger(PwdController.class);
 	private static final Path RECENT_OPENED_PATH = Configs.DATA_FOLDER.resolve(".recentOpened");
 
 	private enum ViewStatus { NoPwd, ReadOnly, Edit}
@@ -118,7 +118,7 @@ public class PwdControllerNEW extends AbstractController implements Initializabl
 
 	private final SimpleObjectProperty<Pwd> selectedPwd = new SimpleObjectProperty<>();
 
-	public PwdControllerNEW(Window window) {
+	public PwdController(Window window) {
 		super(window);
 	}
 
