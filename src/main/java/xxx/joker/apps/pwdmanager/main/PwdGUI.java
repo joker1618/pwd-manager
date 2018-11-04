@@ -27,7 +27,7 @@ public class PwdGUI extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/pwdViewNEW.fxml"));
+		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/pwdView.fxml"));
 		PwdController pwdController = new PwdController(primaryStage);
 		fxmlLoader.setController(pwdController);
 		BorderPane pwdPane = fxmlLoader.load();
