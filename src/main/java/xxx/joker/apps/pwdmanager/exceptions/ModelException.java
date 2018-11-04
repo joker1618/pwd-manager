@@ -1,6 +1,6 @@
 package xxx.joker.apps.pwdmanager.exceptions;
 
-import xxx.joker.libs.javalibs.exception.JkException;
+import xxx.joker.libs.core.exception.JkException;
 
 /**
  * Created by f.barbano on 19/11/2017.

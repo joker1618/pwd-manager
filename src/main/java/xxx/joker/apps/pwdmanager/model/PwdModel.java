@@ -4,9 +4,9 @@ import org.apache.commons.lang3.StringUtils;
 import xxx.joker.apps.pwdmanager.beans.Pwd;
 import xxx.joker.apps.pwdmanager.common.Configs;
 import xxx.joker.apps.pwdmanager.exceptions.ModelException;
-import xxx.joker.libs.javalibs.utils.JkFiles;
-import xxx.joker.libs.javalibs.utils.JkStreams;
-import xxx.joker.libs.javalibs.utils.JkStrings;
+import xxx.joker.libs.core.utils.JkFiles;
+import xxx.joker.libs.core.utils.JkStreams;
+import xxx.joker.libs.core.utils.JkStrings;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

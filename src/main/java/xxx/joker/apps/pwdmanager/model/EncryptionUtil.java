@@ -1,7 +1,7 @@
 package xxx.joker.apps.pwdmanager.model;
 
 
-import xxx.joker.libs.javalibs.utils.JkFiles;
+import xxx.joker.libs.core.utils.JkFiles;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;

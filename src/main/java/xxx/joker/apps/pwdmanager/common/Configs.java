@@ -1,7 +1,7 @@
 package xxx.joker.apps.pwdmanager.common;
 
 import xxx.joker.apps.pwdmanager.main.PwdGUI;
-import xxx.joker.libs.javalibs.utils.JkFiles;
+import xxx.joker.libs.core.utils.JkFiles;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

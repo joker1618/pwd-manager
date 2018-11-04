@@ -7,8 +7,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import xxx.joker.apps.pwdmanager.common.Configs;
 import xxx.joker.apps.pwdmanager.controller.PwdController;
-import xxx.joker.libs.javalibs.utils.JkEncryption;
-import xxx.joker.libs.javalibs.utils.JkFiles;
+import xxx.joker.libs.core.utils.JkEncryption;
+import xxx.joker.libs.core.utils.JkFiles;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -46,7 +46,7 @@ public class PwdGUI extends Application {
 
 	@Override
 	public void stop() throws Exception {
-		JkFiles.removeDirectoryIfExists(Configs.TEMP_FOLDER);
+		JkFiles.removeDirectory(Configs.TEMP_FOLDER);
 	}
 
 	private static void manageAppData() throws IOException, NoSuchAlgorithmException {
@@ -60,7 +60,7 @@ public class PwdGUI extends Application {
 			}
 
 			if(newVersion) {
-				JkFiles.removeDirectoryIfExists(Configs.DATA_FOLDER);
+				JkFiles.removeDirectory(Configs.DATA_FOLDER);
 				JkFiles.writeFile(Configs.MD5SUM_JAR_FILE, actualHash, false);
 			}
 		}

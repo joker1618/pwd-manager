@@ -20,12 +20,12 @@ import xxx.joker.apps.pwdmanager.common.Configs;
 import xxx.joker.apps.pwdmanager.exceptions.ModelException;
 import xxx.joker.apps.pwdmanager.model.IPwdModel;
 import xxx.joker.apps.pwdmanager.model.PwdModel;
-import xxx.joker.libs.javalibs.excel.JkExcelSheet;
-import xxx.joker.libs.javalibs.excel.JkExcelUtil;
-import xxx.joker.libs.javalibs.format.JkColumnFmtBuilder;
-import xxx.joker.libs.javalibs.utils.JkFiles;
-import xxx.joker.libs.javalibs.utils.JkStreams;
-import xxx.joker.libs.javalibs.utils.JkStrings;
+import xxx.joker.libs.excel.JkExcelSheet;
+import xxx.joker.libs.excel.JkExcelUtil;
+import xxx.joker.libs.core.format.JkColumnFmtBuilder;
+import xxx.joker.libs.core.utils.JkFiles;
+import xxx.joker.libs.core.utils.JkStreams;
+import xxx.joker.libs.core.utils.JkStrings;
 
 import java.io.IOException;
 import java.net.URL;
@@ -273,7 +273,7 @@ public class PwdController extends AbstractController implements Initializable {
 			String password = model.getPassword();
 			setPwdFile(newPath, password);
 
-		} catch (ModelException | IOException e) {
+		} catch (ModelException e) {
 			super.alertError("Error while saving password", "File %s", newPath.toString());
 		}
 	}
@@ -318,7 +318,7 @@ public class PwdController extends AbstractController implements Initializable {
 		try {
 			JkFiles.writeFile(newPath, text, true);
 			super.alertInfo("CLEAR FILE SAVED", "%s", newPath);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			super.alertError("Error while saving excel file", "File %s", newPath.toString());
 		}
 	}
