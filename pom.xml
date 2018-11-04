@@ -4,6 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>xxx.joker.parent</groupId>
+        <artifactId>java-8-base-parent</artifactId>
+        <version>1.0</version>
+    </parent>
+
     <groupId>xxx.joker.apps</groupId>
     <artifactId>pwd-manager</artifactId>
     <version>1.0</version>
@@ -24,11 +30,6 @@
             <groupId>xxx.joker.libs</groupId>
             <artifactId>java-excel</artifactId>
             <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.5</version>
         </dependency>
         <!-- JavaFX 2 wrapper to create executable jars -->
         <dependency>

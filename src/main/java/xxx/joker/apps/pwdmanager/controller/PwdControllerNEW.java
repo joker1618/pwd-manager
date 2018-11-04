@@ -12,20 +12,21 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Window;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import xxx.joker.apps.pwdmanager.beans.Pwd;
 import xxx.joker.apps.pwdmanager.common.Configs;
 import xxx.joker.apps.pwdmanager.exceptions.ModelException;
 import xxx.joker.apps.pwdmanager.model.IPwdModel;
 import xxx.joker.apps.pwdmanager.model.PwdModel;
-import xxx.joker.libs.excel.JkExcelSheet;
-import xxx.joker.libs.excel.JkExcelUtil;
 import xxx.joker.libs.core.format.JkColumnFmtBuilder;
 import xxx.joker.libs.core.utils.JkFiles;
 import xxx.joker.libs.core.utils.JkStreams;
 import xxx.joker.libs.core.utils.JkStrings;
+import xxx.joker.libs.excel.JkExcelSheet;
+import xxx.joker.libs.excel.JkExcelUtil;
 
 import java.io.IOException;
 import java.net.URL;
@@ -39,8 +40,9 @@ import java.util.ResourceBundle;
 /**
  * Created by f.barbano on 19/11/2017.
  */
-public class PwdController extends AbstractController implements Initializable {
+public class PwdControllerNEW extends AbstractController implements Initializable {
 
+	private static final Logger logger = LoggerFactory.getLogger(PwdControllerNEW.class);
 	private static final Path RECENT_OPENED_PATH = Configs.DATA_FOLDER.resolve(".recentOpened");
 
 	private enum ViewStatus { NoPwd, ReadOnly, Edit}
@@ -85,6 +87,15 @@ public class PwdController extends AbstractController implements Initializable {
 	private TextArea txtAreaSelNotes;
 
 	@FXML
+	private TextField fieldEditKey;
+	@FXML
+	private TextField fieldEditUsername;
+	@FXML
+	private TextField fieldEditPassword;
+	@FXML
+	private TextArea txtAreaEditNotes;
+
+	@FXML
 	private Button btnAdd;
 	@FXML
 	private Button btnEdit;
@@ -96,6 +107,7 @@ public class PwdController extends AbstractController implements Initializable {
 	private Button btnDelete;
 
 	private IPwdModel model;
+	private Pwd actualEditPwd;
 
 	private ObservableList<MenuItem> itemRecents = FXCollections.observableArrayList();
 
@@ -106,7 +118,7 @@ public class PwdController extends AbstractController implements Initializable {
 
 	private final SimpleObjectProperty<Pwd> selectedPwd = new SimpleObjectProperty<>();
 
-	public PwdController(Window window) {
+	public PwdControllerNEW(Window window) {
 		super(window);
 	}
 
@@ -119,17 +131,19 @@ public class PwdController extends AbstractController implements Initializable {
 		initTableView();
 
 		// Menu items
-		BooleanBinding pwdPathIsNull = Bindings.createBooleanBinding(() -> pwdPath.get() == null, pwdPath);
 		itemNewFile.setOnAction(this::doCreateNewFile);
 		itemOpenFile.setOnAction(this::doOpenFilePath);
 		itemSaveAs.setOnAction(this::doSaveFileAs);
-		itemSaveAs.disableProperty().bind(pwdPathIsNull);
 		itemChangePwd.setOnAction(this::doChangeEncryptionPwd);
-		itemChangePwd.disableProperty().bind(pwdPathIsNull);
 		itemExportClearFile.setOnAction(this::doExportClearFile);
-		itemExportClearFile.disableProperty().bind(pwdPathIsNull);
 		itemExportClearExcel.setOnAction(this::doExportClearExcel);
+
+		BooleanBinding pwdPathIsNull = Bindings.createBooleanBinding(() -> pwdPath.get() == null, pwdPath);
+		itemSaveAs.disableProperty().bind(pwdPathIsNull);
+		itemChangePwd.disableProperty().bind(pwdPathIsNull);
+		itemExportClearFile.disableProperty().bind(pwdPathIsNull);
 		itemExportClearExcel.disableProperty().bind(pwdPathIsNull);
+
 		setRecentOpenedFromFile();
 
 		// Bind filter field
@@ -156,21 +170,47 @@ public class PwdController extends AbstractController implements Initializable {
 
 		// Fields init
 		selectedPwd.bind(tablePwd.getSelectionModel().selectedItemProperty());
-		selectedPwd.addListener((observable, oldValue, newValue) -> updateDetailFields());
-		// Bind editable property
-		BooleanBinding editableBind = Bindings.createBooleanBinding(() -> viewStatus.get() == ViewStatus.Edit, viewStatus);
-		fieldSelKey.editableProperty().bind(editableBind);
-		fieldSelUsername.editableProperty().bind(editableBind);
-		fieldSelPassword.editableProperty().bind(editableBind);
-		txtAreaSelNotes.editableProperty().bind(editableBind);
+		selectedPwd.addListener((observable, oldValue, newValue) -> updateSelectedPwdFields());
 
+		// Bind editable property
+		BooleanBinding disableBind = Bindings.createBooleanBinding(() -> viewStatus.get() != ViewStatus.Edit, viewStatus);
+		fieldEditKey.disableProperty().bind(disableBind);
+		fieldEditUsername.disableProperty().bind(disableBind);
+		fieldEditPassword.disableProperty().bind(disableBind);
+		txtAreaEditNotes.disableProperty().bind(disableBind);
+
+		viewStatus.addListener((observable, oldValue, newValue) -> {
+		    if(newValue != oldValue) {
+		        if(newValue == ViewStatus.Edit) {
+		            actualEditPwd = selectedPwd.get();
+		            fillEditSection(actualEditPwd);
+                } else {
+		            actualEditPwd = null;
+		            clearEditSection();
+                }
+            }
+        });
 	}
+
+    private void fillEditSection(Pwd pwd) {
+        fieldEditKey.setText(pwd.getKey());
+        fieldEditUsername.setText(pwd.getUsername());
+        fieldEditPassword.setText(pwd.getPassword());
+        txtAreaEditNotes.setText(pwd.getNotes());
+    }
+
+    private void clearEditSection() {
+        fieldEditKey.setText("");
+        fieldEditUsername.setText("");
+        fieldEditPassword.setText("");
+        txtAreaEditNotes.setText("");
+    }
 
 	private void initTableView() {
 		tablePwd.setItems(filteredList);
 		tablePwd.setEditable(false);
 		tablePwd.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-		tablePwd.setRowFactory(this::removeRowFocusIfSelected);
+
 		// Columns
 		colKey.setCellValueFactory(new PropertyValueFactory<>("key"));
 		colKey.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -181,28 +221,17 @@ public class PwdController extends AbstractController implements Initializable {
 		colNotes.setCellValueFactory(new PropertyValueFactory<>("notes"));
 		colNotes.setCellFactory(TextFieldTableCell.forTableColumn());
 	}
-	private TableRow<Pwd> removeRowFocusIfSelected(TableView<Pwd> tableView) {
-		TableRow<Pwd> row = new TableRow<>();
-		row.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
-			final int index = row.getIndex();
-			TableView.TableViewSelectionModel<Pwd> selModel = tableView.getSelectionModel();
-			if (index >= 0 && index < tableView.getItems().size()) {
-				viewStatus.setValue(ViewStatus.ReadOnly);
-				if(selModel.getSelectedItems().size() == 1 && selModel.isSelected(index)){
-					selModel.clearSelection(index);
-					event.consume();
-				}
-			}
-		});
-		return row;
-	}
+
 	private void initButtons() {
 		// Disabled property binding
-		btnAdd.disableProperty().bind(Bindings.createBooleanBinding(() -> viewStatus.get() != ViewStatus.ReadOnly, viewStatus));
-		btnEdit.disableProperty().bind(Bindings.createBooleanBinding(() -> viewStatus.get() != ViewStatus.ReadOnly || tablePwd.getSelectionModel().getSelectedItem() == null, viewStatus, tablePwd.getSelectionModel().selectedItemProperty()));
-		btnDelete.disableProperty().bind(Bindings.createBooleanBinding(() -> viewStatus.get() != ViewStatus.ReadOnly || tablePwd.getSelectionModel().getSelectedItem() == null, viewStatus, tablePwd.getSelectionModel().selectedItemProperty()));
-		btnSave.disableProperty().bind(Bindings.createBooleanBinding(() -> viewStatus.get() != ViewStatus.Edit, viewStatus));
-		btnCancel.disableProperty().bind(Bindings.createBooleanBinding(() -> viewStatus.get() != ViewStatus.Edit, viewStatus));
+        BooleanBinding isNotReadOnly = Bindings.createBooleanBinding(() -> viewStatus.get() != ViewStatus.ReadOnly, viewStatus);
+        BooleanBinding isNotEdit = Bindings.createBooleanBinding(() -> viewStatus.get() != ViewStatus.Edit, viewStatus);
+		btnAdd.disableProperty().bind(isNotReadOnly);
+		btnEdit.disableProperty().bind(isNotReadOnly);
+		btnDelete.disableProperty().bind(isNotReadOnly);
+		btnSave.disableProperty().bind(isNotEdit);
+		btnCancel.disableProperty().bind(isNotEdit);
+
 		// Actions
 		btnAdd.setOnAction(this::doAddPassword);
 		btnEdit.setOnAction(this::doEditPassword);
@@ -210,16 +239,13 @@ public class PwdController extends AbstractController implements Initializable {
 		btnSave.setOnAction(this::doSaveChanges);
 		btnCancel.setOnAction(this::doCancelChanges);
 	}
-	private void updateDetailFields() {
+	private void updateSelectedPwdFields() {
 		// Bind text
 		Pwd pwd = selectedPwd.get();
 		fieldSelKey.setText(pwd == null ? "" : pwd.getKey());
 		fieldSelUsername.setText(pwd == null ? "" : pwd.getUsername());
 		fieldSelPassword.setText(pwd == null ? "" : pwd.getPassword());
 		txtAreaSelNotes.setText(pwd == null ? "" : pwd.getNotes());
-		if(pwd == null) {
-			viewStatus.setValue(ViewStatus.ReadOnly);
-		}
 	}
 
 	private void doCreateNewFile(ActionEvent event) {
@@ -453,7 +479,7 @@ public class PwdController extends AbstractController implements Initializable {
 	private void doEditPassword(ActionEvent event) {
 		viewStatus.set(ViewStatus.Edit);
 	}
-
+	
 	private void doDeletePassword(ActionEvent event) {
 		try {
 			Pwd sel = tablePwd.getSelectionModel().getSelectedItem();
@@ -474,31 +500,30 @@ public class PwdController extends AbstractController implements Initializable {
 
 	private void doSaveChanges(ActionEvent event) {
 		Pwd newPwd = new Pwd();
-		newPwd.setKey(fieldSelKey.getText().trim());
-		newPwd.setUsername(fieldSelUsername.getText().trim());
-		newPwd.setPassword(fieldSelPassword.getText().trim());
-		newPwd.setNotes(txtAreaSelNotes.getText().trim());
+		newPwd.setKey(fieldEditKey.getText().trim());
+		newPwd.setUsername(fieldEditUsername.getText().trim());
+		newPwd.setPassword(fieldEditPassword.getText().trim());
+		newPwd.setNotes(txtAreaEditNotes.getText().trim());
 
 		if(StringUtils.isBlank(newPwd.getKey())) {
 			super.alertWarning("Key cannot be empty", null);
 			return;
 		}
 
-		Pwd sel = tablePwd.getSelectionModel().getSelectedItem();
-		if(newPwd.equals(sel)) {
+		if(newPwd.equals(actualEditPwd)) {
 			super.alertInfo("No changes to save", null);
 			viewStatus.setValue(ViewStatus.ReadOnly);
 			return;
 		}
 
-		int found = tableData.filtered(p -> p != sel && StringUtils.equalsAnyIgnoreCase(p.getKey(), newPwd.getKey())).size();
+		int found = tableData.filtered(p -> p != actualEditPwd && StringUtils.equalsAnyIgnoreCase(p.getKey(), newPwd.getKey())).size();
 		if(found > 0) {
 			super.alertWarning("Password key already exists", null);
 			return;
 		}
 
 		try {
-			tableData.remove(sel);
+			tableData.remove(actualEditPwd);
 			tableData.add(newPwd);
 			tableData.sort(newPwd);
 
@@ -516,9 +541,6 @@ public class PwdController extends AbstractController implements Initializable {
 
 	private void doCancelChanges(ActionEvent event) {
 		viewStatus.setValue(ViewStatus.ReadOnly);
-		int index = tablePwd.getSelectionModel().getSelectedIndex();
-		tablePwd.getSelectionModel().clearSelection();
-		tablePwd.getSelectionModel().select(index);
 	}
 
 	private void savePasswordChanges() throws ModelException {
