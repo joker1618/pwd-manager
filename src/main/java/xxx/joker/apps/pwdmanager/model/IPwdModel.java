@@ -4,6 +4,7 @@ import xxx.joker.apps.pwdmanager.beans.Pwd;
 import xxx.joker.apps.pwdmanager.exceptions.ModelException;
 
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -11,7 +12,7 @@ import java.util.List;
  */
 public interface IPwdModel {
 
-	String FILE_HEADER = "KEY|USERNAME|PASSWORD|NOTES";
+	List<String> FILE_HEADER = Arrays.asList("KEY", "USERNAME", "PASSWORD", "NOTES");
 
 	List<Pwd> getPasswords() throws ModelException;
 

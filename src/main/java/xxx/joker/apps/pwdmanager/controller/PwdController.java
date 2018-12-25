@@ -24,16 +24,15 @@ import xxx.joker.apps.pwdmanager.model.PwdModel;
 import xxx.joker.libs.core.format.JkColumnFmtBuilder;
 import xxx.joker.libs.core.utils.JkFiles;
 import xxx.joker.libs.core.utils.JkStreams;
-import xxx.joker.libs.core.utils.JkStrings;
-import xxx.joker.libs.excel.JkExcelSheet;
-import xxx.joker.libs.excel.JkExcelUtil;
+import xxx.joker.libs.excel.JkSheetXSSF;
+import xxx.joker.libs.excel.JkWorkbookXSSF;
 
-import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -336,7 +335,7 @@ public class PwdController extends AbstractController implements Initializable {
 
 		List<Pwd> pwdList = tableData.subList(0, tableData.size());
 		List<String> lines = new ArrayList<>();
-		lines.add(IPwdModel.FILE_HEADER);
+		lines.add(JkStreams.join(IPwdModel.FILE_HEADER, "|"));
 		lines.addAll(JkStreams.map(pwdList, this::toClearLine));
 
 		String text = new JkColumnFmtBuilder(lines).toString("|", 3);
@@ -372,32 +371,33 @@ public class PwdController extends AbstractController implements Initializable {
 		if(newPath == null) 	return;
 
 		newPath = newPath.toAbsolutePath();
-		if(!JkExcelUtil.isExcelFile(newPath)) {
+		if(!StringUtils.endsWithIgnoreCase(newPath.toString(), "xlsx")) {
 			newPath = Paths.get(String.format("%s.xlsx", newPath.toString()));
 		}
 
-		List<Pwd> pwdList = tableData.subList(0, tableData.size());
-
-		List<List<String>> lines = new ArrayList<>();
-		lines.add(JkStrings.splitFieldsList(IPwdModel.FILE_HEADER, "|"));
-		lines.addAll(JkStreams.map(pwdList, pwd -> JkStrings.splitFieldsList(toExcelLine(pwd), "|")));
-
-		JkExcelSheet sheet = new JkExcelSheet("Passwords");
-		sheet.setLines(lines);
-
 		try {
-			JkExcelUtil.createExcelFile(newPath.toFile(), sheet, true);
-			super.alertInfo("CLEAR EXCEL SAVED", "%s", newPath);
-		} catch (IOException e) {
-			super.alertError("Error while saving excel file", "File %s", newPath.toString());
+			try (JkWorkbookXSSF wb = new JkWorkbookXSSF()) {
+				JkSheetXSSF sheet = wb.getSheet("Pwd");
+				sheet.setStrings(0, 0, IPwdModel.FILE_HEADER);
+				List<Pwd> pwdList = tableData.subList(0, tableData.size());
+				for (int i = 0; i < pwdList.size(); i++) {
+					sheet.setStrings(1 + i, 0, toExcelLine(pwdList.get(i)));
+				}
+				wb.persist(newPath);
+				super.alertInfo("Passwords saved in clear in excel file", "Path: %s", newPath);
+			}
+
+		} catch (Exception e) {
+			super.alertError("Error while creating excel file", "File %s", newPath.toString());
 		}
 	}
-	private String toExcelLine(Pwd pwd) {
-		return String.format("%s|%s|%s|%s",
-			pwd.getKey(),
-			pwd.getUsername(),
-			pwd.getPassword(),
-			pwd.getNotes()
+
+	private List<String> toExcelLine(Pwd pwd) {
+		return Arrays.asList(
+				pwd.getKey(),
+				pwd.getUsername(),
+				pwd.getPassword(),
+				pwd.getNotes()
 		);
 	}
 
