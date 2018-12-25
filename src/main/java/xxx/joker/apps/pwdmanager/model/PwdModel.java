@@ -61,7 +61,7 @@ public class PwdModel implements IPwdModel {
 	public void savePasswords(List<Pwd> pwdList) throws ModelException {
 		try {
 			List<String> lines = JkStreams.map(pwdList, this::pwdToString);
-			lines.add(0, FILE_HEADER);
+			lines.add(0, JkStreams.join(FILE_HEADER, "|"));
 			JkFiles.writeFile(TEMP_FILE_PATH, lines, true);
 			EncryptionUtil.encryptFile(TEMP_FILE_PATH, pwdPath, EncryptionUtil.getMD5(password), true);
 			Files.delete(TEMP_FILE_PATH);
