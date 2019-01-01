@@ -378,10 +378,10 @@ public class PwdController extends AbstractController implements Initializable {
 		try {
 			try (JkWorkbookXSSF wb = new JkWorkbookXSSF()) {
 				JkSheetXSSF sheet = wb.getSheet("Pwd");
-				sheet.setStrings(0, 0, IPwdModel.FILE_HEADER);
+				sheet.setValues(0, 0, IPwdModel.FILE_HEADER);
 				List<Pwd> pwdList = tableData.subList(0, tableData.size());
 				for (int i = 0; i < pwdList.size(); i++) {
-					sheet.setStrings(1 + i, 0, toExcelLine(pwdList.get(i)));
+					sheet.setValues(1 + i, 0, toExcelLine(pwdList.get(i)));
 				}
 				wb.persist(newPath);
 				super.alertInfo("Passwords saved in clear in excel file", "Path: %s", newPath);
