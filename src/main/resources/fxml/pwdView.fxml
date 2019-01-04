@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-
 <BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <top>
         <VBox alignment="TOP_CENTER" spacing="10.0" BorderPane.alignment="CENTER">
@@ -18,7 +17,6 @@
                             <MenuItem fx:id="itemSaveAs" text="Save As..."/>
                             <MenuItem fx:id="itemChangePwd" text="Change encryption password"/>
                             <MenuItem fx:id="itemExportClearFile" text="Export clear file"/>
-                            <MenuItem fx:id="itemExportClearExcel" text="Export clear excel"/>
                             <Menu fx:id="menuRecents" text="Reopen"/>
                         </items>
                     </Menu>

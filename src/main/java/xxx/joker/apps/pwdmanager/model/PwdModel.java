@@ -49,7 +49,8 @@ public class PwdModel implements IPwdModel {
 			EncryptionUtil.decryptFile(pwdPath, TEMP_FILE_PATH, EncryptionUtil.getMD5(password), true);
 			List<String> lines = Files.readAllLines(TEMP_FILE_PATH);
 			Files.delete(TEMP_FILE_PATH);
-			lines.removeIf(line -> StringUtils.isBlank(line) || line.equals(FILE_HEADER));
+			lines = JkStreams.map(lines, String::trim);
+			lines.removeIf(line -> StringUtils.isBlank(line) || line.startsWith(FILE_HEADER.get(0)));
 			return JkStreams.map(lines, this::parsePwd);
 
 		} catch (Exception e) {

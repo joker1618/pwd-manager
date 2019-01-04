@@ -26,11 +26,6 @@
             <artifactId>java-core</artifactId>
             <version>1.0</version>
         </dependency>
-        <dependency>
-            <groupId>xxx.joker.libs</groupId>
-            <artifactId>java-excel</artifactId>
-            <version>1.0</version>
-        </dependency>
         <!-- JavaFX 2 wrapper to create executable jars -->
         <dependency>
             <groupId>com.zenjava</groupId>

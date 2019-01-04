@@ -24,15 +24,12 @@ import xxx.joker.apps.pwdmanager.model.PwdModel;
 import xxx.joker.libs.core.format.JkColumnFmtBuilder;
 import xxx.joker.libs.core.utils.JkFiles;
 import xxx.joker.libs.core.utils.JkStreams;
-import xxx.joker.libs.excel.JkSheetXSSF;
-import xxx.joker.libs.excel.JkWorkbookXSSF;
 
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -56,8 +53,6 @@ public class PwdController extends AbstractController implements Initializable {
 	private MenuItem itemChangePwd;
 	@FXML
 	private MenuItem itemExportClearFile;
-	@FXML
-	private MenuItem itemExportClearExcel;
 	@FXML
 	private Menu menuRecents;
 	@FXML
@@ -135,13 +130,11 @@ public class PwdController extends AbstractController implements Initializable {
 		itemSaveAs.setOnAction(this::doSaveFileAs);
 		itemChangePwd.setOnAction(this::doChangeEncryptionPwd);
 		itemExportClearFile.setOnAction(this::doExportClearFile);
-		itemExportClearExcel.setOnAction(this::doExportClearExcel);
 
 		BooleanBinding pwdPathIsNull = Bindings.createBooleanBinding(() -> pwdPath.get() == null, pwdPath);
 		itemSaveAs.disableProperty().bind(pwdPathIsNull);
 		itemChangePwd.disableProperty().bind(pwdPathIsNull);
 		itemExportClearFile.disableProperty().bind(pwdPathIsNull);
-		itemExportClearExcel.disableProperty().bind(pwdPathIsNull);
 
 		setRecentOpenedFromFile();
 
@@ -342,6 +335,7 @@ public class PwdController extends AbstractController implements Initializable {
 
 		try {
 			JkFiles.writeFile(newPath, text, true);
+			JkFiles.writeFile(Paths.get(newPath.toString()+".csv"), lines, true);
 			super.alertInfo("CLEAR FILE SAVED", "%s", newPath);
 		} catch (Exception e) {
 			super.alertError("Error while saving excel file", "File %s", newPath.toString());
@@ -353,51 +347,6 @@ public class PwdController extends AbstractController implements Initializable {
 			pwd.getUsername(),
 			pwd.getPassword(),
 			pwd.getNotes().replaceAll("\t", " ").replaceAll("\n", "; ")
-		);
-	}
-
-	private void doExportClearExcel(ActionEvent event) {
-		boolean ask = true;
-		Path newPath = null;
-		while(ask) {
-			newPath = super.saveFile("Select file path", model.getFilePath());
-			if (JkFiles.areEquals(model.getFilePath(), newPath)) {
-				super.alertError("ILLEGAL OUTPUT PATH", "Cannot override original password file \"%s\"", model.getFilePath());
-			} else {
-				ask = false;
-			}
-		}
-
-		if(newPath == null) 	return;
-
-		newPath = newPath.toAbsolutePath();
-		if(!StringUtils.endsWithIgnoreCase(newPath.toString(), "xlsx")) {
-			newPath = Paths.get(String.format("%s.xlsx", newPath.toString()));
-		}
-
-		try {
-			try (JkWorkbookXSSF wb = new JkWorkbookXSSF()) {
-				JkSheetXSSF sheet = wb.getSheet("Pwd");
-				sheet.setValues(0, 0, IPwdModel.FILE_HEADER);
-				List<Pwd> pwdList = tableData.subList(0, tableData.size());
-				for (int i = 0; i < pwdList.size(); i++) {
-					sheet.setValues(1 + i, 0, toExcelLine(pwdList.get(i)));
-				}
-				wb.persist(newPath);
-				super.alertInfo("Passwords saved in clear in excel file", "Path: %s", newPath);
-			}
-
-		} catch (Exception e) {
-			super.alertError("Error while creating excel file", "File %s", newPath.toString());
-		}
-	}
-
-	private List<String> toExcelLine(Pwd pwd) {
-		return Arrays.asList(
-				pwd.getKey(),
-				pwd.getUsername(),
-				pwd.getPassword(),
-				pwd.getNotes()
 		);
 	}
 
