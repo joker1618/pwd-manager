@@ -12,7 +12,7 @@ import java.nio.file.Paths;
  */
 public class Configs {
 
-	public static final Path ROOT_FOLDER = Paths.get(System.getProperty("user.home")).resolve(".tempApps/pwd_manager");
+	public static final Path ROOT_FOLDER = Paths.get(System.getProperty("user.home")).resolve(".appsFolder/pwd_manager");
 	public static final boolean RUN_ON_IDE;
 	static {
 		Path launcherPath = JkFiles.getLauncherPath(PwdGUI.class);
