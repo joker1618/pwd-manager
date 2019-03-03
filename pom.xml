@@ -95,7 +95,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${user.home}/JokerApps/pwd-manager</outputDirectory>
+                            <outputDirectory>${joker.apps.folder}/pwd-manager</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${project.build.directory}</directory>
