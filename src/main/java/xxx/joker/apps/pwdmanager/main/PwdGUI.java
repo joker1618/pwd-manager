@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import org.scenicview.ScenicView;
 import xxx.joker.apps.pwdmanager.common.Configs;
 import xxx.joker.apps.pwdmanager.controller.PwdController;
 import xxx.joker.libs.core.utils.JkEncryption;
@@ -18,9 +19,11 @@ import java.nio.file.Files;
  */
 public class PwdGUI extends Application {
 
+	public static boolean scenicView;
 
 	public static void main(String[] args) throws IOException {
 		manageAppData();
+		scenicView = args.length > 1 && "-sv".equals(args[0]);
 		launch();
 	}
 
@@ -39,7 +42,7 @@ public class PwdGUI extends Application {
 		primaryStage.setMaximized(true);
 		primaryStage.show();
 
-//		ScenicView.show(scene);
+		ScenicView.show(scene);
 	}
 
 	@Override
