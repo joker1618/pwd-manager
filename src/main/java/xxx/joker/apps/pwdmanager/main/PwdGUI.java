@@ -42,7 +42,9 @@ public class PwdGUI extends Application {
 		primaryStage.setMaximized(true);
 		primaryStage.show();
 
-		ScenicView.show(scene);
+		if(scenicView) {
+			ScenicView.show(scene);
+		}
 	}
 
 	@Override
