@@ -1,11 +1,14 @@
 package xxx.joker.apps.pwdmanager.main;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import org.scenicview.ScenicView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import xxx.joker.apps.pwdmanager.common.Configs;
 import xxx.joker.apps.pwdmanager.controller.PwdController;
 import xxx.joker.libs.core.utils.JkEncryption;
@@ -19,11 +22,13 @@ import java.nio.file.Files;
  */
 public class PwdGUI extends Application {
 
+	public static final Logger logger = LoggerFactory.getLogger(PwdGUI.class);
+
 	public static boolean scenicView;
 
 	public static void main(String[] args) throws IOException {
 		manageAppData();
-		scenicView = args.length > 1 && "-sv".equals(args[0]);
+		scenicView = args.length == 1 && "-sv".equals(args[0]);
 		launch();
 	}
 
@@ -44,12 +49,17 @@ public class PwdGUI extends Application {
 
 		if(scenicView) {
 			ScenicView.show(scene);
+			primaryStage.setOnCloseRequest(e -> Platform.exit());
 		}
 	}
 
 	@Override
 	public void stop() throws Exception {
-		JkFiles.removeDirectory(Configs.TEMP_FOLDER);
+		logger.info("Closing app");
+		if(Files.exists(Configs.TEMP_FOLDER)) {
+			JkFiles.removeDirectory(Configs.TEMP_FOLDER);
+			logger.info("Removed folder {}", Configs.TEMP_FOLDER);
+		}
 	}
 
 	private static void manageAppData() throws IOException {
