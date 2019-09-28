@@ -45,6 +45,7 @@ public class PwdGUI extends Application {
 		primaryStage.setScene(scene);
 
 		primaryStage.setMaximized(true);
+		primaryStage.setTitle("F1 VIDEO PLAYER");
 		primaryStage.show();
 
 		if(scenicView) {
